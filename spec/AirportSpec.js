@@ -9,7 +9,7 @@ describe("Airport", function() {
     // I want to instruct a plane to land at an airport
     it("an airport can land a plane", function() {
         var airport = new Airport();
-        var plane = "a plane";
+        var plane = jasmine.createSpy('plane');
         airport.land(plane)
         expect(airport.planes).toContain(plane);
     });
