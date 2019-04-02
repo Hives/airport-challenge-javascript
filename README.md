@@ -153,4 +153,60 @@ Airport.prototype.takeOff = function(plane) {
 
 And that passes!
 
+### Raising errors to deal with edge cases
 
+Let's add in a couple of edge cases now - we don't want to be able to land a plane that's already at the airport, and we don't want to an airport to tell a plane to take off if it's not at the airport. For these situations we're going to want to raise errors, and also test that errors were raised. In TDD style let's find out how to `expect` errors first. The Jasmine docs were helpful last time, so let's start there again. We find this in [the matchers section](https://jasmine.github.io/2.0/introduction#section-Included_Matchers):
+
+```javascript
+// in a describe block
+var baz = function() {
+    throw 'what';
+};
+
+expect(baz).toThrow('what');
+```
+
+That tells us how to throw an exception as well as how to test it. Let's use it in a test:
+
+```javascript
+it ("an airport cannot land a plane that's already landed", function() {
+    var airport = new Airport();
+    var plane = jasmine.createSpy('plane');
+    airport.land(plane);
+    expect(airport.land(plane)).toThrow("Could not land plane. Plane is already landed.");
+});
+```
+
+This gives an unexpected error: `Error: <toThrow> : Actual is not a Function`. We were looking for something like `no error was thrown`. Looking at the example from the Jasmine docs above more closely I see that the function `baz` is passed into the `expect()` function, but not actually called. But in my test I am executing the `airport.land()` method rather than passing it. But I can't just pass the method into `expect()` as I need to include the `plane` argument... OK, let's have another look in Jasmine's docs and see what we can find. Searching the docs page for instances of 'toThrow' I find this:
+
+```javascript
+it("throws the value", function() {
+    expect(function() {
+        foo.setBar(123)
+    }).toThrowError("quux");
+});
+```
+
+This is in the section about spies, but maybe we can use the same syntax for our test? Let's rewrite our expectation like this:
+
+```javascript
+expect(function() {
+    airport.land(plane);
+}).toThrow("Could not lane plane. Plane is already landed.");
+```
+
+This seems familiar to us, as we remember that RSpec matchers that expect exceptions to be thrown require the code being tested to be wrapped in a block, so the `function` in this case is the equivalent to a Ruby block.
+
+With this change we're getting an error that looks like what we want: `Expected function to throw an exception.` With a bit more googling (JavaScript's `if` syntax), we pass the test like this:
+
+```javascript
+Airport.prototype.land = function(plane) {
+    if (this.planes.includes(plane)) {
+        throw "Could not land plane. Plane is already landed.";
+    };
+
+    this.planes.push(plane);
+}
+```
+
+That passes. We can also now easily write a test to check that `airport.takeOff` throws an error if the plane is not at the airport.
