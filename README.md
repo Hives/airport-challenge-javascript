@@ -121,6 +121,36 @@ it("an airport can land a plane", function() {
 });
 ```
 
-Tests are passing, so that seems to be working.
+Tests are passing, so that seems to be working. Now let's try writing a test for the second user story:
+
+```
+it("an airport can tell a plane to take off", function() {
+    var airport = new Airport();
+    var plane1 = jasmine.createSpy('plane1');
+    var plane2 = jasmine.createSpy('plane2');
+    var plane3 = jasmine.createSpy('plane3');
+    airport.land(plane1);
+    airport.land(plane2);
+    airport.land(plane3);
+    airport.takeOff(plane2);
+    expect(airport.planes).not.toContain(plane2);
+});
+```
+
+Following the error messages I define an `airport.takeOff()` method in my airport definition, and I end up with this error message:
+
+```javascript
+Expected [ spy on plane1, spy on plane2, spy on plane3 ] not to contain spy on plane2.
+```
+
+In my ruby program I implemented this by doing something like `planes -= [plane]`. I wonder if the same syntax works in JavaScript? Let's try adding this to my airport definition:
+
+```javascript
+Airport.prototype.takeOff = function(plane) {
+    this.planes -= [plane];
+}
+```
+
+And that passes!
 
 
