@@ -44,8 +44,8 @@ OK, we're up and running!
 
 Now let's look at the first user story:
 
-> As an air traffic controller
-> So I can get passengers to a destination
+> As an air traffic controller  
+> So I can get passengers to a destination  
 > I want to instruct a plane to land at an airport
 
 So let's add this to our tests:
@@ -129,8 +129,8 @@ Tests are passing, so that seems to be working.
 
 [GitHub commit for this section](https://github.com/Hives/airport-challenge-javascript/commit/af7e02cd1974e91dd2c3a91673db9957136d0f0e#diff-4a1f251abc2397e671496199529d49d1)
 
-> As an air traffic controller 
-> So I can get passengers on the way to their destination 
+> As an air traffic controller  
+> So I can get passengers on the way to their destination  
 > I want to instruct a plane to take off from an airport and confirm that it is no longer in the airport
 
 Now let's try writing a test for the second user story:
@@ -164,6 +164,8 @@ Airport.prototype.takeOff = function(plane) {
 ```
 
 And that passes!
+
+**SPOILER ALERT - I later realise that this is wrong!**
 
 ### Raising errors to deal with edge cases
 
@@ -227,6 +229,8 @@ That passes. We can also now easily write a test to check that `airport.takeOff`
 
 ### Hold up, wait a minute
 
+[GitHub commit for this section](https://github.com/Hives/airport-challenge-javascript/commit/d893382f7274e9d3a3b9696411e838938887407f#diff-4a1f251abc2397e671496199529d49d1)
+
 Our test for a plane taking off was a bad test! As well as testing that `plane2` is no longer in `airport.planes`, we need to test that `plane1` and `plane3` still are. Let's update the test like this:
 
 ```javascript
@@ -275,4 +279,31 @@ That wasn't so bad. Tests are now passing again.
 
 ### Refactoring
 
+[GitHub commit for this section](https://github.com/Hives/airport-challenge-javascript/commit/124dc92624ab1e01484abf45c8bc961d765bdbb0#diff-4a1f251abc2397e671496199529d49d1)
+
+Our code is ripe for a refactor now. Our tests in particular are not very DRY, so let's move all the object initialisations into a `beforeEach` function.
+
+From googling to find out more about implementing OOP in JavaScript I found [this page (OOP In JavaScript: What You NEED to Know)](https://javascriptissexy.com/oop-in-javascript-what-you-need-to-know/) which suggests it's slightly neater to add methods to the prototype in one go by doing:
+
+```javascript
+Airport.prototype = {
+    method1: function() { /* .. */ },
+    method2: function() { /* .. */ }
+};
+// rather than a bunch of these:
+Aiport.prototype.method1 = function() { /* .. */ };
+Aiport.prototype.method2 = function() { /* .. */ };
+```
+
+Only thing you have to watch out for is re-including the constructor, as this method overrides it. So let's rewrite out `Airport.js` like that.
+
 ### Stubbing out random behaviour in tests - user stories 3 and 4
+
+> As an air traffic controller  
+> To ensure safety  
+> I want to prevent takeoff when weather is stormy
+
+> As an air traffic controller  
+> To ensure safety  
+> I want to prevent landing when weather is stormy
+
