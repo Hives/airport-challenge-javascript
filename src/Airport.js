@@ -13,5 +13,6 @@ Airport.prototype.takeOff = function(plane) {
         throw "Plane could not take off. Plane is not at airport.";
     };
 
-    this.planes -= [plane];
+    var index = this.planes.indexOf(plane);
+    this.planes.splice(index, 1);
 }

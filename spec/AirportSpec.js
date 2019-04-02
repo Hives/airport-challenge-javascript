@@ -35,6 +35,8 @@ describe("Airport", function() {
         airport.land(plane2);
         airport.land(plane3);
         airport.takeOff(plane2);
+        expect(airport.planes).toContain(plane1);
+        expect(airport.planes).toContain(plane3);
         expect(airport.planes).not.toContain(plane2);
     });
 

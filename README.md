@@ -11,6 +11,8 @@ The idea was to write a program in a language we had little to no experience in.
 
 ### Getting up and running
 
+[GitHub commit for this section](https://github.com/Hives/airport-challenge-javascript/commit/560b9b9a4d63771f517ad2062515b61b4aadfb6e)
+
 At the point of starting the project I had got as far as TDDing FizzBuzz using JavaScript with the [Jasmine](https://jasmine.github.io/) framework. So the first thing I did was download Jasmine and unzip it to create my program and testing framework.
 
 Since I'd implemented the same project in Ruby a few weeks ago I was decided not to plan too much and dive straight in with my first test. Since we're learning, let's start with something simple that isn't strictly required by the user stories: asserting that a new `airport` object should be empty.
@@ -37,6 +39,8 @@ var Airport = function Airport() {
 OK, we're up and running!
 
 ### First user story - landing planes
+
+[GitHub commit for this section](https://github.com/Hives/airport-challenge-javascript/commit/95e5691ebbf664b4634a0a42eab167866def129f)
 
 Now let's look at the first user story:
 
@@ -88,13 +92,11 @@ Airport.prototype.land = function(plane) {
 
 That passes the test. At this point I notice that if you rerun the Jasmine test page then the order of the tests changes. Clicking on the 'Options' button in the corner I see it's an option you can turn on or off. This is new compared to RSpec, but seems like a good idea - your tests should be independent, so they should pass whatever order you run them in.
 
-### Second user story - using Jasmine mocks
+### Using Jasmine mocks
 
-> As an air traffic controller 
-> So I can get passengers on the way to their destination 
-> I want to instruct a plane to take off from an airport and confirm that it is no longer in the airport
+[Relevant part of GitHub commit for this section](https://github.com/Hives/airport-challenge-javascript/commit/8abd83e52638eb2949369712200ae1239e5afc52#diff-4a1f251abc2397e671496199529d49d1)
 
-For this user story I want to check that the right plane leaves the airport when I tell it to take off, so my test will land a bunch of planes, tell one to take off, and check that only that one is no longer at the airport. Since I'll need a way to identify different planes and I'm going to need to mock them out eventually, now might be a good time to work out how mocks work in Jasmine.
+For the next user story I want to check that the right plane leaves the airport when I tell it to take off, so my test will land a bunch of planes, tell one to take off, and check that only that one is no longer at the airport. Since I'll need a way to identify different planes and I'm going to need to mock them out eventually, now might be a good time to work out how mocks work in Jasmine.
 
 So I googled 'jasmine mocks', and this was the second result: [How to write better Jasmine tests with mocks](https://eclipsesource.com/blogs/2014/03/27/mocks-in-jasmine-tests/). From this I learned that Jasmine has things called 'spies' which seem to be what I'm looking for. The rest of that article seemed too complicated for what I wanted, so let's ignore the rest of it and look in Jasmine's docs for 'spies' instead. And we find [this](https://jasmine.github.io/2.0/introduction#section-Spies:_%3Ccode%3EcreateSpy%3C/code%3E):
 
@@ -121,7 +123,17 @@ it("an airport can land a plane", function() {
 });
 ```
 
-Tests are passing, so that seems to be working. Now let's try writing a test for the second user story:
+Tests are passing, so that seems to be working.
+
+### Second user story
+
+[GitHub commit for this section](https://github.com/Hives/airport-challenge-javascript/commit/af7e02cd1974e91dd2c3a91673db9957136d0f0e#diff-4a1f251abc2397e671496199529d49d1)
+
+> As an air traffic controller 
+> So I can get passengers on the way to their destination 
+> I want to instruct a plane to take off from an airport and confirm that it is no longer in the airport
+
+Now let's try writing a test for the second user story:
 
 ```
 it("an airport can tell a plane to take off", function() {
@@ -154,6 +166,8 @@ Airport.prototype.takeOff = function(plane) {
 And that passes!
 
 ### Raising errors to deal with edge cases
+
+[GitHub commit for this section](https://github.com/Hives/airport-challenge-javascript/commit/b6bf6cf8d3f1345a005ec5e855d3da7eca90800f#diff-4a1f251abc2397e671496199529d49d1)
 
 Let's add in a couple of edge cases now - we don't want to be able to land a plane that's already at the airport, and we don't want to an airport to tell a plane to take off if it's not at the airport. For these situations we're going to want to raise errors, and also test that errors were raised. In TDD style let's find out how to `expect` errors first. The Jasmine docs were helpful last time, so let's start there again. We find this in [the matchers section](https://jasmine.github.io/2.0/introduction#section-Included_Matchers):
 
@@ -210,3 +224,55 @@ Airport.prototype.land = function(plane) {
 ```
 
 That passes. We can also now easily write a test to check that `airport.takeOff` throws an error if the plane is not at the airport.
+
+### Hold up, wait a minute
+
+Our test for a plane taking off was a bad test! As well as testing that `plane2` is no longer in `airport.planes`, we need to test that `plane1` and `plane3` still are. Let's update the test like this:
+
+```javascript
+it("an airport can tell a plane to take off", function() {
+    var airport = new Airport();
+    var plane1 = jasmine.createSpy('plane1');
+    var plane2 = jasmine.createSpy('plane2');
+    var plane3 = jasmine.createSpy('plane3');
+    airport.land(plane1);
+    airport.land(plane2);
+    airport.land(plane3);
+    airport.takeOff(plane2);
+    expect(airport.planes).toContain(plane1);
+    expect(airport.planes).toContain(plane3);
+    expect(airport.planes).not.toContain(plane2);
+});
+```
+
+And in fact, this is failing:
+
+```
+Expected NaN to contain spy on plane1.
+Expected NaN to contain spy on plane3.
+```
+
+So after calling `airport.takeOff(plane2)` our `airport.planes` is returning `NaN`, JavaScript's 'not a number' keyword. Looks like our Ruby-like syntax of `this.planes -= [plane];` was too good be true after all.
+
+So we google 'javascript remove from array by value', and the top result tells us:
+
+> The best way to remove an element from an array based on the value in JavaScript is to find index number of that value in an array using indexOf() function and then delete particular index value using the splice() function. For example use following code...
+
+Now I'm starting to miss Ruby's magic :( but let's do what they suggest:
+
+```javascript
+Airport.prototype.takeOff = function(plane) {
+    if (!this.planes.includes(plane)) {
+        throw "Plane could not take off. Plane is not at airport.";
+    };
+
+    var index = this.planes.indexOf(plane);
+    this.planes.splice(index, 1);
+}
+```
+
+That wasn't so bad. Tests are now passing again.
+
+### Refactoring
+
+### Stubbing out random behaviour in tests - user stories 3 and 4
