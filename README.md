@@ -465,3 +465,24 @@ The only part I didn't already know was how to set up my weather mock to receive
 With this in place the tests all pass, and the tests for `Airport` still pass if we comment out everything in `Weather.js`. Which is what we were aiming for. [GitHub commit for this.](https://github.com/Hives/airport-challenge-javascript/commit/268c28d42a230ba9d17efbab7beceab0bb767b72#diff-4a1f251abc2397e671496199529d49d1)
 
 As an aside, where I've defined `weather = { isStormy: function() {} }`, it looks like all you need to do is have any property in there with the right name, and then you can stub out the behaviour using a spy. So you could have `isStormy: false` or `isStormy: NaN`. I went with `isStormy: function() {}` because that gives you more of an idea of what the real `isStormy` is like, but I wonder if there's a convention here?
+
+### Magic numbers - maximum airport capacity
+
+Fifth user story:
+
+> As an air traffic controller
+> To ensure safety
+> I want to prevent landing when the airport is full
+
+So we need to set a maximum airport capacity. When I did this in Ruby, rather than hard-coding a 'magic number' in a method, I defined a constant in my `Airport` class. That looked like this:
+
+```ruby
+class Airport
+  DEFAULT_CAPACITY = 3
+  # loads of code...
+end
+```
+
+So I'm guessing I'll want to do something similar in JavaScript, because magic numbers are bad in any language.
+
+Let's start by TDDing a solution, and then refactor out the magic number. Here's a [GitHub commit](https://github.com/Hives/airport-challenge-javascript/commit/ae42236038fc9f5595901980e2d92701962f0576#diff-4a1f251abc2397e671496199529d49d1) for the user story implemented with the maximum capacity hard coded to 3.

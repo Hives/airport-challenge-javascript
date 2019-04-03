@@ -13,6 +13,9 @@ Airport.prototype = {
     if (this.planes.includes(plane)) {
       throw "Could not land plane. Plane is already landed.";
     };
+    if (this.planes.length === 3) {
+      throw "Could not land plane. Airport at maximum capacity.";
+    };
 
     this.planes.push(plane);
   },

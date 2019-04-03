@@ -1,5 +1,5 @@
 describe("Airport", function() {
-  var airport, weather, plane1, plane2, plane3;
+  var airport, weather, plane1, plane2, plane3, plane4;
 
   beforeEach(function() {
     weather = {
@@ -9,6 +9,7 @@ describe("Airport", function() {
     plane1 = jasmine.createSpy('plane1');
     plane2 = jasmine.createSpy('plane2');
     plane3 = jasmine.createSpy('plane3');
+    plane4 = jasmine.createSpy('plane4');
   });
 
   describe("initialisation", function() {
@@ -36,6 +37,15 @@ describe("Airport", function() {
         expect(function() {
           airport.land(plane1);
         }).toThrow("Could not land plane. Plane is already landed.");
+      });
+
+      it ("an airport can't land a plane if it's at maximum capacity", function() {
+        airport.land(plane1);
+        airport.land(plane2);
+        airport.land(plane3);
+        expect(function() {
+          airport.land(plane4);
+        }).toThrow("Could not land plane. Airport at maximum capacity.");
       });
     });
 
