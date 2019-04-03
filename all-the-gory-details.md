@@ -12,9 +12,9 @@ In this document I've recorded in **a lot** of detail the process I went through
 
 At the point of starting the project I had got as far as TDDing FizzBuzz using JavaScript with the [Jasmine](https://jasmine.github.io/) framework. So the first thing I did was download Jasmine and unzip it to create my program and testing framework.
 
-Since I'd implemented the same project in Ruby a few weeks ago I was decided not to plan too much and dive straight in with my first test. Since we're learning, let's start with something simple that isn't strictly required by the user stories: asserting that a new `airport` object should be empty.
+Since I'd recently implemented the same project in Ruby I decided not to plan too much and dive straight in with my first test. Since we're learning, let's start with something simple that isn't strictly required by the user stories: asserting that a new `airport` object should be empty, just to get up and running.
 
-Having already done some basic testing in Jasmine, and due to the syntax's similarity to RSpec, with which I was already familiar, I knew I had to update my `SpecHelper.html` to run my tests, and then I wrote this test in `spec/AirportSpec.js`:
+From reading the introduction on the Jasmine website I knew I had to update my `SpecHelper.html` to run my tests. By looking at the examples tests that are included when you download Jasmine, and because of its similarity to RSpec, without too much trouble I wrote this test in `spec/AirportSpec.js`:
 
 ```javascript
 describe("Airport", function() {
@@ -60,7 +60,7 @@ We don't know anything about `plane` at this point. I'll probably want to use a 
 
 Test is failing:
 
-```javascript
+```
 TypeError: airport.land is not a function in file:///Users/student/Documents/week-5/airport-challenge-javascript/spec/AirportSpec.js (line 10)
 ```
 
@@ -89,7 +89,7 @@ Airport.prototype.land = function(plane) {
 
 That passes the test. At this point I notice that if you rerun the Jasmine test page then the order of the tests changes. Clicking on the 'Options' button in the corner I see it's an option you can turn on or off. This is new compared to RSpec, but seems like a good idea - your tests should be independent, so they should pass whatever order you run them in.
 
-### Using Jasmine mocks
+### Using Jasmine spies
 
 [Relevant part of GitHub commit for this section](https://github.com/Hives/airport-challenge-javascript/commit/8abd83e52638eb2949369712200ae1239e5afc52#diff-4a1f251abc2397e671496199529d49d1)
 
@@ -162,7 +162,7 @@ Airport.prototype.takeOff = function(plane) {
 
 And that passes!
 
-**SPOILER ALERT - I later realise that this is wrong!**
+**SPOILER ALERT - This doesn't actually work! My test is bad! I fix it later!**
 
 ### Raising errors to deal with edge cases
 
@@ -200,7 +200,7 @@ it("throws the value", function() {
 });
 ```
 
-This is in the section about spies, but maybe we can use the same syntax for our test? Let's rewrite our expectation like this:
+This is in the section about spies, and in the example `foo` is a spy, but maybe we can use the same syntax for our test? Let's rewrite our expectation like this:
 
 ```javascript
 expect(function() {
@@ -208,7 +208,7 @@ expect(function() {
 }).toThrow("Could not lane plane. Plane is already landed.");
 ```
 
-This seems familiar to us, as we remember that RSpec matchers that expect exceptions to be thrown require the code being tested to be wrapped in a block, so the `function` in this case is the equivalent to a Ruby block.
+This seems familiar to us, as we remember that RSpec expressions that expect exceptions to be thrown require the code to be wrapped in a block, so the `function` in this case is the equivalent to a Ruby block.
 
 With this change we're getting an error that looks like what we want: `Expected function to throw an exception.` With a bit more googling (JavaScript's `if` syntax), we pass the test like this:
 
@@ -259,7 +259,7 @@ So we google 'javascript remove from array by value', and the top result tells u
 
 > The best way to remove an element from an array based on the value in JavaScript is to find index number of that value in an array using indexOf() function and then delete particular index value using the splice() function. For example use following code...
 
-Now I'm starting to miss Ruby's magic :( but let's do what they suggest (after googling `.splice()` to check we understand how it works):
+That sounds much more complicated than Ruby. I'm starting to miss Ruby's magic :( but let's do what they suggest (after googling `.splice()` to check we understand how it works):
 
 ```javascript
 Airport.prototype.takeOff = function(plane) {
@@ -278,7 +278,7 @@ That wasn't so bad. Tests are now passing again.
 
 [GitHub commit for this section](https://github.com/Hives/airport-challenge-javascript/commit/124dc92624ab1e01484abf45c8bc961d765bdbb0#diff-4a1f251abc2397e671496199529d49d1)
 
-Our code is ripe for a refactor now. Our tests in particular are not very DRY, so let's move all the object initialisations into a `beforeEach` function.
+Our tests are not very DRY, so I refactored them by moving all the object initialisations into a `beforeEach` function.
 
 From googling to find out more about implementing OOP in JavaScript I found [this page (OOP In JavaScript: What You NEED to Know)](https://javascriptissexy.com/oop-in-javascript-what-you-need-to-know/) which suggests it's slightly neater to add methods to the prototype in one go by doing:
 
@@ -287,14 +287,18 @@ Airport.prototype = {
     method1: function() { /* .. */ },
     method2: function() { /* .. */ }
 };
-// rather than a bunch of these:
+```
+
+rather than a bunch of these:
+
+```javascript
 Aiport.prototype.method1 = function() { /* .. */ };
 Aiport.prototype.method2 = function() { /* .. */ };
 ```
 
 Only thing you have to watch out for is re-including the constructor, as this method overrides it. So let's rewrite out `Airport.js` like that.
 
-Let's also break up our tests by adding in separate `describe` functions for the methods we're testing.
+Let's also organise our tests by adding in separate `describe` functions for the methods we're testing.
 
 ### Stubbing out random behaviour in tests - user stories 3 and 4
 
@@ -383,15 +387,11 @@ Now we're getting the error we expect: `Expected function to throw an exception.
 
 [GitHub commit for this section](https://github.com/Hives/airport-challenge-javascript/commit/268c28d42a230ba9d17efbab7beceab0bb767b72#diff-4a1f251abc2397e671496199529d49d1)
 
-But we don't want to leave the weather situation like this. Deciding whether the weather is good or bad shouldn't be the responsibility of our airport object. We should extract a weather object to do that. But we also want the tests for our airport and weather objects to be independent, so to achieve that we'll need to pass the weather object in as a dependency, and stub out it's behaviour in the tests for airport.
+But we don't want to leave the weather situation like this. Deciding whether the weather is good or bad shouldn't be the responsibility of our airport object. We should extract a weather object to do that. But we also want the tests for our airport and weather objects to be independent, so to achieve that we'll need to pass the weather object in as a dependency, and stub out it's behaviour in the tests for `airport`.
 
 Let's start by TDDing a weather object, then inject it into our airport object via the constructor, then update our tests to mock its behaviour.
 
-In Ruby we would do something like `weather.stormy?` and expect it to return a boolean
-
-Let's start by TDDing a weather object, then inject it into our airport object via the constructor, then update our tests to mock its behaviour.
-
-In Ruby we would do something like `weather.stormy?` and expect it to return a boolean. I know this is called a predicate method in Ruby, so I google 'predicate method javascript' and quickly find that they're called predicate methods in JavaScript too, and the convention Script is to write them as e.g. `weather.isStormy()`.
+In Ruby we would do something like `weather.stormy?` and expect it to return a boolean. I know we've called this a predicate method in Ruby, so I google 'predicate method javascript' and quickly find that they're called predicate methods in general, and the convention in JavaScript is to write them as e.g. `weather.isStormy()`.
 
 We will also need to test whether the method is returning true or false, and the Jasmine docs tell us we can do that with `expect(true).toBe(true)`. So knowing that we can write our tests. I cheated and wrote two at the same time:
 
@@ -432,7 +432,7 @@ Weather.prototype = {
 
 All tests passing. ([GitHub commit for this.](https://github.com/Hives/airport-challenge-javascript/commit/43e57004bb4da9b46a353e3c228600a2e118a29a#diff-54656ca4d5078be80cb746321c597634))
 
-Now let's inject this into the Airport definition:
+Now we can inject this into our `Airport` and stub the behaviour out in our tests:
 
 ```javascript
 describe("Airport", function() {
@@ -467,8 +467,8 @@ As an aside, where I've defined `weather = { isStormy: function() {} }`, it look
 
 Fifth user story:
 
-> As an air traffic controller
-> To ensure safety
+> As an air traffic controller  
+> To ensure safety  
 > I want to prevent landing when the airport is full
 
 So we need to set a maximum airport capacity. When I did this in Ruby, rather than hard-coding a 'magic number' in a method, I defined a constant in my `Airport` class. That looked like this:
@@ -530,8 +530,8 @@ Here's the [GitHub commit for this section](https://github.com/Hives/airport-cha
 
 [GitHub commit for this section](https://github.com/Hives/airport-challenge-javascript/commit/49a18e8606b178ba65c42ce94e2fecb80ecb1123#diff-4a1f251abc2397e671496199529d49d1).
 
-> As the system designer
-> So that the software can be used for many different airports
+> As the system designer  
+> So that the software can be used for many different airports  
 > I would like a default airport capacity that can be overridden as appropriate
 
 For this one we'll need to pass in an optional argument which will override the default maximum capacity. Googling 'javascript optional arguments' brings up [this MDN page](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/Default_parameters) which says you can make default values for your arguments like this:
@@ -590,7 +590,7 @@ The instructions for the airport challenge say that you should deal with various
 Here's how I would approach this:
 
 - TDD a plane object that knows whether it's flying or not, whether it's at an airport, and if so, which one.
-- Have the `airport.land()` method call a `plane.land()` method when landing a plane, which will perform various checks on the plane such as whether it's flying, or whether it's at another airport.
+- Have the `airport.land()` method call a `plane.land()` method when landing a plane, which will perform various checks on the plane such as whether it's flying, or whether it's at another airport, and modify its status if appropriate.
 - Do the equivalent for `airport.takeOff()` with a `plane.takeOff()` method.
 
 For completeness I would like to come back and do this, but my main purpose for this project is to document and reflect on my process for learning a new language. The implementation of these last stages won't involve anything I haven't already done in this project. I'd use dependency injection to separate the implementation of `plane` and `airport`, and ensure the tests are independent. I would need to implement feature tests too which would check the interaction of the two classes. But for now I think I've got plenty of material I can use to reflect on my process of learning a new language.
