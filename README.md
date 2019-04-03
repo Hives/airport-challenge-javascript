@@ -383,3 +383,54 @@ Math.random = jasmine.createSpy().and.returnValue(0.24)
 Now we're getting the error we expect: `Expected function to throw an exception.` So we can pass the test and implement the user Story in the same way as the last one.
 
 ### Dependency injection - creating a weather object
+
+But we don't want to leave the weather situation like this. Deciding whether the weather is good or bad shouldn't be the responsibility of our airport object. We should extract a weather object to do that. But we also want the tests for our airport and weather objects to be independent, so to achieve that we'll need to pass the weather object in as a dependency, and stub out it's behaviour in the tests for airport.
+
+Let's start by TDDing a weather object, then inject it into our airport object via the constructor, then update our tests to mock its behaviour.
+
+In Ruby we would do something like `weather.stormy?` and expect it to return a boolean
+
+Let's start by TDDing a weather object, then inject it into our airport object via the constructor, then update our tests to mock its behaviour.
+
+In Ruby we would do something like `weather.stormy?` and expect it to return a boolean. I know this is called a predicate method in Ruby, so I google 'predicate method javascript' and quickly find that they're called predicate methods in JavaScript too, and the convention Script is to write them as e.g. `weather.isStormy()`.
+
+We will also need to test whether the method is returning true or false, and the Jasmine docs tell us we can do that with `expect(true).toBe(true)`. So knowing that we can write our tests. I cheated and wrote two at the same time:
+
+```javascript
+describe("Weather", function() {
+  var weather
+
+  beforeEach(function() {
+    weather = new Weather();
+  });
+
+  describe(".isStormy", function() {
+    it ("returns true if `Math.random()` < 0.25", function() {
+      spyOn(Math, 'random').and.returnValue(0.24);
+      expect(weather.isStormy()).toBe(true);
+    });
+
+    it ("returns false if `Math.random()` >= 0.25", function() {
+      spyOn(Math, 'random').and.returnValue(0.25);
+      expect(weather.isStormy()).toBe(false);
+    });
+  });
+});
+```
+
+So we add this into `SpecRunner.html` and follow the errors though to produce this definition for weather:
+
+```javascript
+function Weather() {};
+
+Weather.prototype = {
+  constructor: Weather,
+  isStormy: function() {
+    return Math.random() < 0.25;
+  }
+};
+```
+
+All tests passing. ([GitHub commit for this.](https://github.com/Hives/airport-challenge-javascript/commit/43e57004bb4da9b46a353e3c228600a2e118a29a#diff-54656ca4d5078be80cb746321c597634))
+
+
