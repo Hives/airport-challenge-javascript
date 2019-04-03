@@ -4,7 +4,7 @@
 
 The idea was to write a program in a language we had little to no experience in. The Airport Challenge tests your ability to use basic OOP principles like encapsulation and SRP, TDD, stubbing random behaviour, writing readable code etc.
 
-In this document I've recorded in **a lot** of detail the process I went through to complete a project in a new(ish) language.
+In this document I've recorded in **a lot** of detail the process I went through to complete a project in a new(ish) language. I wanted to be really aware of what I was doing to get myself unstuck at each point, whether it was googling, reading the docs, trying random stuff in the console or whatever, so that I could reflect on my process.
 
 ### Getting up and running
 
@@ -487,15 +487,15 @@ Let's start by TDDing a solution, and then refactor out the magic number. Here's
 ```javascript
 array = [0,1,2]
 array.size()
-// nope
+/* nope */
 array.length()
-// nope
+/* nope */
 array.count()
-// nope
+/* nope */
 array.count
-// undefined
+/* undefined */
 array.length
-// 3 👍
+/* 3 👍 */
 ```
 
 A bit of googling turned up [this page on MDN](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/const), which says that you can define constants using the `const` keyword. Testing this in Chrome devtools reveals that they really are constants - unlike in Ruby if you try and change them it will give an error. It looks like this is part of the ES6 specification.
