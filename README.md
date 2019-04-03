@@ -485,4 +485,44 @@ end
 
 So I'm guessing I'll want to do something similar in JavaScript, because magic numbers are bad in any language.
 
-Let's start by TDDing a solution, and then refactor out the magic number. Here's a [GitHub commit](https://github.com/Hives/airport-challenge-javascript/commit/ae42236038fc9f5595901980e2d92701962f0576#diff-4a1f251abc2397e671496199529d49d1) for the user story implemented with the maximum capacity hard coded to 3.
+Let's start by TDDing a solution, and then refactor out the magic number. Here's a [GitHub commit](https://github.com/Hives/airport-challenge-javascript/commit/ae42236038fc9f5595901980e2d92701962f0576#diff-4a1f251abc2397e671496199529d49d1) for the user story implemented with the maximum capacity hard coded to 3. The only new thing in this step was finding out the length of an array. I worked this out by guessing various options in Chrome developer tools:
+
+```javascript
+array = [0,1,2]
+array.size()
+\\ nope
+array.length()
+\\ nope
+array.count()
+\\ nope
+array.count
+\\ undefined
+array.length
+\\ 3 👍
+```
+
+A bit of googling turned up [this page on MDN](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/const), which says that you can define constants using the `const` keyword. Testing this in Chrome devtools reveals that they really are constants, unlike in Ruby if you try and change them it will give an error. It looks like this is part of the ES6 specification.
+
+With a bit of trial and error, I find out I can use this in my `Airport.js` like this:
+
+```javascript
+var Airport = function Airport(weather) {
+  const MAXIMUM_CAPACITY = 3;
+  this.MAXIMUM_CAPACITY = MAXIMUM_CAPACITY;
+  // etc...
+}
+
+Airport.prototype = {
+  constructor: Airport,
+
+  land: function(plane) {
+    if (this.planes.length === this.MAXIMUM_CAPACITY) {
+      throw "Could not land plane. Airport at maximum capacity.";
+    };
+    // etc...
+  }
+  // etc...
+}
+```
+
+Here's the [GitHub commit for this section](https://github.com/Hives/airport-challenge-javascript/commit/3f0fbf1dff1df8cd30acca04848459dab0d91e27#diff-bc953886de721c08be5a6263819855c2).
