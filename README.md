@@ -501,7 +501,7 @@ array.length
 \\ 3 👍
 ```
 
-A bit of googling turned up [this page on MDN](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/const), which says that you can define constants using the `const` keyword. Testing this in Chrome devtools reveals that they really are constants, unlike in Ruby if you try and change them it will give an error. It looks like this is part of the ES6 specification.
+A bit of googling turned up [this page on MDN](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/const), which says that you can define constants using the `const` keyword. Testing this in Chrome devtools reveals that they really are constants - unlike in Ruby if you try and change them it will give an error. It looks like this is part of the ES6 specification.
 
 With a bit of trial and error, I find out I can use this in my `Airport.js` like this:
 
@@ -525,4 +525,61 @@ Airport.prototype = {
 }
 ```
 
+That MDN page says it's a convention to use ALL_CAPS for constants. Although my `this.MAXIMUM_CAPACITY` isn't a `const` I've written its name in caps anyway to indicate that it should be viewed as a constant by any developer reading my code, even though strictly it isn't. Not sure about this bit... will ask a coach.
+
 Here's the [GitHub commit for this section](https://github.com/Hives/airport-challenge-javascript/commit/3f0fbf1dff1df8cd30acca04848459dab0d91e27#diff-bc953886de721c08be5a6263819855c2).
+
+### Final user story
+
+[GitHub commit for this section](https://github.com/Hives/airport-challenge-javascript/commit/49a18e8606b178ba65c42ce94e2fecb80ecb1123#diff-4a1f251abc2397e671496199529d49d1).
+
+> As the system designer
+> So that the software can be used for many different airports
+> I would like a default airport capacity that can be overridden as appropriate
+
+For this one we'll need to pass in an optional argument which will override the default maximum capacity. Googling 'javascript optional arguments' brings up [this MDN page](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/Default_parameters) which says you can make default values for your arguments like this:
+
+```javascript
+function multiply(a, b = 1) {
+  return a * b;
+}
+```
+
+However, our airport constructor will take two arguments, `weather` and `maximumCapacity`, both of which we want to make optional. So we want to be able to pass either one without having to pass the other. In Ruby you can achieve this by using named arguments. [Some googling](http://2ality.com/2011/11/keyword-parameters.html) reveals that JavaScript doesn't support this, but the workaround is to pass arguments in as an options object, and then handle the case where any of the options aren't provided in the constructor.
+
+(Side note: this has reminded me that I need to provide a default option for `weather` in my airport constructor. It'll be my `Weather` object. Will come back to this...)
+
+This will mean rewriting all our tests, but that's OK. Our new test looks like this:
+
+```javascript
+describe("airport capacity", function() {
+  it("the default capacity can be overridden", function() {
+    airport = new Airport({ maxCapacity: 2 });
+    expect(airport.MAXIMUM_CAPACITY).toEqual(2);
+  });
+});
+```
+
+And we can pass that by rewriting our airport constructor (also adding in a default option for `weather`:
+
+```javascript
+var Airport = function Airport(options) {
+  const MAXIMUM_CAPACITY = 3;
+
+  if (options === undefined) options = {};
+  if (options.weather === undefined) options.weather = new Weather();
+  if (options.maxCapacity === undefined) options.maxCapacity = MAXIMUM_CAPACITY;
+
+  this.MAXIMUM_CAPACITY = options.maxCapacity;
+  this.weather = options.weather;
+  this.planes = [];
+}
+```
+
+Now our test for overriding the default capacity works, but most of the other tests are failing because of the change to the constructor. We just need to update how the airport object is initialised in the test like this:
+
+```javascript
+airport = new Airport({weather: weather});
+```
+
+Now all tests are passing.

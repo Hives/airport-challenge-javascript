@@ -1,8 +1,12 @@
+var Airport = function Airport(options) {
+  const DEFAULT_MAX_CAPACITY = 3;
 
-var Airport = function Airport(weather) {
-  const MAXIMUM_CAPACITY = 3;
-  this.MAXIMUM_CAPACITY = MAXIMUM_CAPACITY;
-  this.weather = weather;
+  if (options === undefined) options = {};
+  if (options.weather === undefined) options.weather = new Weather();
+  if (options.maxCapacity === undefined) options.maxCapacity = DEFAULT_MAX_CAPACITY;
+
+  this.MAXIMUM_CAPACITY = options.maxCapacity;
+  this.weather = options.weather;
   this.planes = [];
 }
 

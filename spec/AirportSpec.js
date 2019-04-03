@@ -5,7 +5,7 @@ describe("Airport", function() {
     weather = {
       isStormy: function() {}
     };
-    airport = new Airport(weather);
+    airport = new Airport({weather: weather});
     plane1 = jasmine.createSpy('plane1');
     plane2 = jasmine.createSpy('plane2');
     plane3 = jasmine.createSpy('plane3');
@@ -27,12 +27,12 @@ describe("Airport", function() {
       // As an air traffic controller
       // So I can get passengers to a destination
       // I want to instruct a plane to land at an airport
-      it("an airport can land a plane that isn't already landed", function() {
+      it("an airport can land a plane that isn't already at the airport", function() {
         airport.land(plane1)
         expect(airport.planes).toContain(plane1);
       });
 
-      it ("an airport can't land a plane that is already landed", function() {
+      it ("an airport can't land a plane that's already at the airport", function() {
         airport.land(plane1);
         expect(function() {
           airport.land(plane1);
@@ -40,6 +40,7 @@ describe("Airport", function() {
       });
 
       it ("an airport can't land a plane if it's at maximum capacity", function() {
+        airport = new Airport({ weather: weather, maxCapacity: 3 });
         airport.land(plane1);
         airport.land(plane2);
         airport.land(plane3);
@@ -78,7 +79,7 @@ describe("Airport", function() {
         expect(airport.planes).not.toContain(plane2);
       });
 
-      it("an airport cannot tell a plane to take off if it's not there", function() {
+      it("an airport cannot tell a plane to take off if it's not at the airport", function() {
         airport.land(plane1);
         expect(function() {
           airport.takeOff(plane2);
@@ -97,6 +98,18 @@ describe("Airport", function() {
         expect(function() {
           airport.takeOff(plane1);
         }).toThrow("Plane could not take off. Weather was stormy.");
+      });
+    });
+
+    describe("airport capacity", function() {
+      it("the default capacity can be overridden", function() {
+        airport = new Airport({ maxCapacity: 2 });
+        expect(airport.MAXIMUM_CAPACITY).toEqual(2);
+      });
+
+      it("if no maxCapacity is provided it uses the default of 3", function() {
+        airport = new Airport();
+        expect(airport.MAXIMUM_CAPACITY).toEqual(3);
       });
     });
   });
