@@ -1,4 +1,5 @@
-var Airport = function Airport() {
+var Airport = function Airport(weather) {
+  this.weather = weather;
   this.planes = [];
 }
 
@@ -6,7 +7,7 @@ Airport.prototype = {
   constructor: Airport,
 
   land: function(plane) {
-    if (Math.random() < 0.25) {
+    if (this.weather.isStormy()) {
       throw "Could not land plane. Weather was stormy.";
     };
     if (this.planes.includes(plane)) {
@@ -17,7 +18,7 @@ Airport.prototype = {
   },
 
   takeOff: function(plane) {
-    if (Math.random() < 0.25) {
+    if (this.weather.isStormy()) {
       throw "Plane could not take off. Weather was stormy.";
     };
     if (!this.planes.includes(plane)) {

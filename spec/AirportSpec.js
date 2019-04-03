@@ -1,8 +1,11 @@
 describe("Airport", function() {
-  var airport, plane1, plane2, plane3;
+  var airport, weather, plane1, plane2, plane3;
 
   beforeEach(function() {
-    airport = new Airport();
+    weather = {
+      isStormy: function() {}
+    };
+    airport = new Airport(weather);
     plane1 = jasmine.createSpy('plane1');
     plane2 = jasmine.createSpy('plane2');
     plane3 = jasmine.createSpy('plane3');
@@ -17,7 +20,7 @@ describe("Airport", function() {
   describe(".land", function() {
     describe("when the weather is good", function () {
       beforeEach(function() {
-        spyOn(Math, 'random').and.returnValue(0.25);
+        spyOn(weather, 'isStormy').and.returnValue(false);
       });
 
       // As an air traffic controller
@@ -38,7 +41,7 @@ describe("Airport", function() {
 
     describe("when the weather is bad", function() {
       it ("planes can't land", function() {
-        spyOn(Math, 'random').and.returnValue(0.24);
+        spyOn(weather, 'isStormy').and.returnValue(true);
         expect(function() {
           airport.land(plane1);
         }).toThrow("Could not land plane. Weather was stormy.");
@@ -49,7 +52,7 @@ describe("Airport", function() {
   describe(".takeOff", function() {
     describe("when the weather is good", function () {
       beforeEach(function() {
-        spyOn(Math, 'random').and.returnValue(0.25);
+        spyOn(weather, 'isStormy').and.returnValue(false);
       });
       
       // As an air traffic controller
@@ -78,9 +81,9 @@ describe("Airport", function() {
     // I want to prevent landing when weather is stormy
     describe("when the weather is bad", function () {
       it ("planes can't take off", function() {
-        spyOn(Math, 'random').and.returnValue(0.25);
+        spyOn(weather, 'isStormy').and.returnValue(false);
         airport.land(plane1)
-        Math.random = jasmine.createSpy().and.returnValue(0.24)
+        weather.isStormy = jasmine.createSpy().and.returnValue(true);
         expect(function() {
           airport.takeOff(plane1);
         }).toThrow("Plane could not take off. Weather was stormy.");

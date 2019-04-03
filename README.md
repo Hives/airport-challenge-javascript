@@ -384,6 +384,8 @@ Now we're getting the error we expect: `Expected function to throw an exception.
 
 ### Dependency injection - creating a weather object
 
+[GitHub commit for this section](https://github.com/Hives/airport-challenge-javascript/commit/268c28d42a230ba9d17efbab7beceab0bb767b72#diff-4a1f251abc2397e671496199529d49d1)
+
 But we don't want to leave the weather situation like this. Deciding whether the weather is good or bad shouldn't be the responsibility of our airport object. We should extract a weather object to do that. But we also want the tests for our airport and weather objects to be independent, so to achieve that we'll need to pass the weather object in as a dependency, and stub out it's behaviour in the tests for airport.
 
 Let's start by TDDing a weather object, then inject it into our airport object via the constructor, then update our tests to mock its behaviour.
@@ -433,4 +435,33 @@ Weather.prototype = {
 
 All tests passing. ([GitHub commit for this.](https://github.com/Hives/airport-challenge-javascript/commit/43e57004bb4da9b46a353e3c228600a2e118a29a#diff-54656ca4d5078be80cb746321c597634))
 
+Now let's inject this into the Airport definition:
 
+```javascript
+describe("Airport", function() {
+  var airport, weather, plane1, plane2, plane3;
+
+  beforeEach(function() {
+    weather = {
+      isStormy: function() {}
+    };
+    airport = new Airport(weather);
+    // ...
+  });
+
+  describe(".land", function() {
+    describe("when the weather is good", function () {
+      beforeEach(function() {
+        spyOn(weather, 'isStormy').and.returnValue(false);
+      });
+
+      /* tests etc... */
+  });
+});
+```
+
+The only part I didn't already know was how to set up my weather mock to receive `isStormy` messages, but a quick look in the Jasmine docs gave me the answer.
+
+With this in place the tests all pass, and the tests for `Airport` still pass if we comment out everything in `Weather.js`. Which is what we were aiming for. [GitHub commit for this.](https://github.com/Hives/airport-challenge-javascript/commit/268c28d42a230ba9d17efbab7beceab0bb767b72#diff-4a1f251abc2397e671496199529d49d1)
+
+As an aside, where I've defined `weather = { isStormy: function() {} }`, it looks like all you need to do is have any property in there with the right name, and then you can stub out the behaviour using a spy. So you could have `isStormy: false` or `isStormy: NaN`. I went with `isStormy: function() {}` because that gives you more of an idea of what the real `isStormy` is like, but I wonder if there's a convention here?
