@@ -297,13 +297,89 @@ Aiport.prototype.method2 = function() { /* .. */ };
 
 Only thing you have to watch out for is re-including the constructor, as this method overrides it. So let's rewrite out `Airport.js` like that.
 
+Let's also break up our tests by adding in separate `describe` functions for the methods we're testing.
+
 ### Stubbing out random behaviour in tests - user stories 3 and 4
+
+[GitHub commit for this section (I reindented everything at this point so it's hard to see what changed...)](https://github.com/Hives/airport-challenge-javascript/commit/3677aee2fa6e0943278799edf48b4137d263541c#diff-4a1f251abc2397e671496199529d49d1)
 
 > As an air traffic controller  
 > To ensure safety  
 > I want to prevent takeoff when weather is stormy
 
+We want the weather behaviour to be random. From doing this project in Ruby I know that to reliably test for this we're going to have to stub out the random behaviour. Here's [a StackOverflow answer](https://stackoverflow.com/a/15753204/1107844) that suggests mocking the behaviour of `Math.random`, so we'll try that.
+
+To write this test we also need to have an idea how `Math.random` works. [According to MDN](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Math/random):
+
+> The Math.random() function returns a floating-point, pseudo-random number in the range 0–1 (inclusive of 0, but not 1) with approximately uniform distribution over that range — which you can then scale to your desired range.
+
+So let's say that in our program we'll pick a random number between 0 and 1, and the weather will be stormy if the number is < 0.25.
+
+Now we know enough to write a test. Something like this:
+
+```javascript
+it ("when the weather is bad planes can't land", function() {
+    spyOn(Math, 'random').and.returnValue(0.24);
+    expect(function() {
+        airport.land(plane1);
+    }).toThrow("Could not land plane. Weather was stormy.");
+});
+```
+
+Update our `Airport.land` method like this to pass this test:
+
+```javascript
+// inside Aiport.prototype
+land: function(plane) {
+    if (Math.random() < 0.25) {
+        throw "Could not land plane. Weather was stormy.";
+    };
+    if (this.planes.includes(plane)) {
+        throw "Could not land plane. Plane is already landed.";
+    };
+    this.planes.push(plane);
+}
+```
+
+But now of course all the other tests are randomly passing or failing, so we need to stub the weather to be good in all of them too. No new knowledge required for that
+
+Once we've done that it should be easy to implement the fourth user story, which is very similar:
+
 > As an air traffic controller  
 > To ensure safety  
 > I want to prevent landing when weather is stormy
 
+We write this test:
+
+```javascript
+describe("when the weather is bad", function () {
+  it ("planes can't take off", function() {
+    spyOn(Math, 'random').and.returnValue(0.25);
+    airport.land(plane1)
+    spyOn(Math, 'random').and.returnValue(0.24);
+    expect(function() {
+      airport.takeOff(plane1);
+    }).toThrow("Plane could not take off. Weather was stormy.");
+  });
+```
+
+But we get a surprising new error:
+
+```
+Error: <spyOn> : random has already been spied upon Usage: spyOn(<object>, <methodName>) in file:///Users/student/Documents/week-5/airport-challenge-javascript/lib/jasmine-3.3.0/jasmine.js (line 6178)
+```
+
+What does that mean - you can't change the behaviour of a spy after you've set it?? Googling the error message turns up a [StackOverflow answer](https://stackoverflow.com/a/28821717/1107844):
+
+> You can just overwrite it
+> `updateService.getUpdate = jasmine.createSpy().and.returnValue(etc)`
+
+So in our program that will look like:
+
+```javascript
+Math.random = jasmine.createSpy().and.returnValue(0.24)
+```
+
+Now we're getting the error we expect: `Expected function to throw an exception.` So we can pass the test and implement the user Story in the same way as the last one.
+
+### Dependency injection - creating a weather object
