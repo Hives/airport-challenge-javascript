@@ -259,7 +259,7 @@ So we google 'javascript remove from array by value', and the top result tells u
 
 > The best way to remove an element from an array based on the value in JavaScript is to find index number of that value in an array using indexOf() function and then delete particular index value using the splice() function. For example use following code...
 
-Now I'm starting to miss Ruby's magic :( but let's do what they suggest:
+Now I'm starting to miss Ruby's magic :( but let's do what they suggest (after googling `.splice()` to check we understand how it works):
 
 ```javascript
 Airport.prototype.takeOff = function(plane) {
@@ -487,15 +487,15 @@ Let's start by TDDing a solution, and then refactor out the magic number. Here's
 ```javascript
 array = [0,1,2]
 array.size()
-\\ nope
+// nope
 array.length()
-\\ nope
+// nope
 array.count()
-\\ nope
+// nope
 array.count
-\\ undefined
+// undefined
 array.length
-\\ 3 👍
+// 3 👍
 ```
 
 A bit of googling turned up [this page on MDN](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/const), which says that you can define constants using the `const` keyword. Testing this in Chrome devtools reveals that they really are constants - unlike in Ruby if you try and change them it will give an error. It looks like this is part of the ES6 specification.
