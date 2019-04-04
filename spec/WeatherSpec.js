@@ -6,12 +6,12 @@ describe("Weather", function() {
   });
 
   describe(".isStormy", function() {
-    it ("returns true if `Math.random()` < 0.25", function() {
+    it ("it can be stormy", function() {
       spyOn(Math, 'random').and.returnValue(0.24);
       expect(weather.isStormy()).toBe(true);
     });
 
-    it ("returns false if `Math.random()` >= 0.25", function() {
+    it ("it can be not stormy", function() {
       spyOn(Math, 'random').and.returnValue(0.25);
       expect(weather.isStormy()).toBe(false);
     });

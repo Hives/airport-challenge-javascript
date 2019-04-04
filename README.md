@@ -9,11 +9,11 @@ The Airport Challenge.... but in JavaScript!!!
 
 ### I can learn anything by myself
 
-My aim for this piece of work was to TDD a simple program using JavaScript and Jasmine so that I could reflect on my process of learning to use a new language and test framework. I had done some JavaScript before so I knew some of its syntax, but I'd never done any OOP in it, and I'd never used a JavaScript testing framework, so that was all new.
+My aim for this piece of work was to learn enough JavaScript and Jasmine to test drive a simple program, and then reflect on my process of learning to use a new language and test framework. I had done some JavaScript before so I knew some of its syntax, but I'd never done any OOP in it, and I'd never used a JavaScript testing framework, so that was all new.
 
 ## Process
 
-The idea was to write a program in a language I had little to no experience in. The Airport Challenge tests your ability to use OOP principles like SRP, TDD, stubbing out random behaviour, writing readable code etc.
+The idea was to write a program in a language I had little experience in.
 
 I recorded my process of doing in this in **a lot** of detail in [this document](all-the-gory-details.md). I wanted to be really aware as I was working on this of everything I was doing to get unstuck, whether it was googling, reading the docs, trying random stuff out in the console, interrogating my test error messages, or anything else. I think this degree of self-consciousness caused me to concentrate less on some other aspects of my coding, but it's given me a lot of material to use to reflect on my learning process.
 
