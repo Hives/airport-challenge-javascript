@@ -51,9 +51,9 @@ I googled many, many things. The single most helpful page I found was probably [
 
 ### Copy and pasting is not a good way to learn
 
-A corollary to the previous section. Copy and pasting code from StackOverflow without understanding it not a good way to learn, and may come back and bite you if the code doesn't do quite what you thought. This is a greater risk in an unfamiliar language. Where I found bits of code through googling I tried to investigate and understand exactly what they were doing before using them.
+A corollary to the previous section. Copy and pasting code from StackOverflow without understanding it not a good way to learn, and may come back and bite you if the code doesn't do quite what you thought. This is a greater risk in an unfamiliar language where there's more stuff you don't know. Where I found bits of code through googling I tried to investigate and understand exactly what they were doing before using them.
 
 ### Test errors are your friends
 
-I mentioned this before, but I think it deserves it's own subheading. My TDD test error messages took on a new dimension of helpfulness when working in a language I wasn't so familiar with. Googling the error messages often revealed bits of syntax I had misunderstood or guessed badly, quickly expanding my knowledge. I think the fact that I found myself quite comfortable with Jasmine helped here.
+I mentioned this before, but I think it deserves it's own subheading. My TDD test error messages took on a new dimension of helpfulness when feeling my way in a language I wasn't familiar with. Googling the error messages often revealed bits of syntax I had misunderstood or guessed badly, quickly expanding my knowledge.
 
